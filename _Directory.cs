@@ -16,7 +16,7 @@ namespace Programming
 		{
 		}
 
-		public _Directory(string n, byte attr, int siz, int fc,_Directory parent) : base( n,  attr,  empty,  siz,  fc)
+		public _Directory(string n, byte attr, int siz, int fc,_Directory parent) : base( n,  attr, siz,  fc)
 		{
             DirectoryTable = new List<Directory_Entry>();
 

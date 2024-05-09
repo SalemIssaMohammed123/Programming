@@ -13,16 +13,9 @@ namespace Programming
         public static string Name = @"D:\VirtualDisk.txt";
         public static void Initialize()
         {
-            _Directory root = new _Directory("root", 1, null, 0, 5, null);
+            _Directory root = new _Directory("root", 1, 0, 5, null);
             Program.current_Directory = root;
             root.Write_Directory();
-            //root.write();
-            /*First, it checks if there exists a virtual disk (text
-            file) (class File)
-            If the file doesn’t exist -> we first create the
-            text file with the name (‘Disk.txt’)
-            Using FileStream?
-             */
             if (!File.Exists("VirtualDisk.txt"))
             {
                 using (FileStream fs = new FileStream("VirtualDisk.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite))

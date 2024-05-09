@@ -4,17 +4,17 @@ namespace Programming
 {
     public class Program : CommandsImplementation
     { 
-        static string currentDirectory = Directory.GetCurrentDirectory();
         public static string current_Path;
         public static string input;
-		public static _Directory current_Directory = new _Directory();
+		public static _Directory current_Directory ;
 		static void Main(string[] args)
         {   //initialize both virtual disk and FAT System
             Virtual_Disk.Initialize();
             FAT_Table.initialize();
+            current_Path = new string(current_Directory.name);
             while (true)
             {
-                Console.Write($"{currentDirectory}> ");
+                Console.Write($"{current_Path}> ");
                  input = Console.ReadLine().Trim().ToLower();
 
                 if (string.IsNullOrWhiteSpace(input))
@@ -34,6 +34,42 @@ namespace Programming
                         break;
                     case "quit":
                         Environment.Exit(0);
+                        break;
+                    case "cd":
+                        cd(parameter);
+                        break;
+                    case "md":
+                        md(parameter);
+                        break;
+                    case "rd":
+                        rd(parameter);
+                        break;
+                    case "rename":
+                        string[] renameParams = parameter.Split(' ', 2);
+                        string sourceFileName = renameParams[0];
+                        string targetFileName = renameParams.Length > 1 ? renameParams[1] : "";
+                        rename(sourceFileName, targetFileName);
+                        break;
+                    case "copy":
+                        string[] copyParams = parameter.Split(' ', 2);
+                        string SourceFileName = copyParams[0];
+                        string TargetFileName = copyParams.Length > 1 ? copyParams[1] : "";
+                        copy(SourceFileName, TargetFileName);
+                        break;
+                    case "type":
+                        type(parameter);
+                        break;
+                    case "del":
+                        del(parameter);
+                        break;
+                    case "import":
+                        import(parameter);
+                        break;
+                    case "export":
+                        string[] exportParams = parameter.Split(' ', 2);
+                        string srcFileName = exportParams[0];
+                        string target_FileName = exportParams.Length > 1 ? exportParams[1] : "";
+                        export(srcFileName, target_FileName);
                         break;
                     default:
                         Console.WriteLine("Command not recognized. Type 'help' for a list of available commands.");

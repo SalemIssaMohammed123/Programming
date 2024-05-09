@@ -212,17 +212,17 @@ namespace Programming
 
         public void update(Directory_Entry d)
         {
-            _Directory d = new _Directory();
+            _Directory directory = new _Directory();
 
-            d.Read_Directory();
+            directory.Read_Directory();
             int index = Search_Directory(new string(d.name));
 
 
             if (index != -1)
             {
-                d.DirectoryTable.RemoveAt(index);
-                d.DirectoryTable.Insert(index, d);
-                d.Write_Directory();
+                directory.DirectoryTable.RemoveAt(index);
+                directory.DirectoryTable.Insert(index, d);
+                directory.Write_Directory();
 
             }
             else
