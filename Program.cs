@@ -5,6 +5,7 @@ namespace Programming
     public class Program : CommandsImplementation
     { 
         static string currentDirectory = Directory.GetCurrentDirectory();
+        public static string current_Path;
         public static string input;
 		public static _Directory current_Directory = new _Directory();
 		static void Main(string[] args)

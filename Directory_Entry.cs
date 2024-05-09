@@ -15,7 +15,7 @@ namespace Programming
 		public int first_cluster;//4 byte
 		//total 32 byte
 		public Directory_Entry() { }
-		public Directory_Entry(string n, byte attr, byte[] empty, int siz ,int fc)
+		public Directory_Entry(string n, byte attr, int siz ,int fc)
 		{
 			attribute = attr;
 			if(attribute == 0)//file

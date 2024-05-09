@@ -11,14 +11,20 @@ namespace Programming
 	public class _Directory : Directory_Entry
 	{
 		public _Directory parent;
-        public List<Directory_Entry> DirectoryTable = new List<Directory_Entry>();
+        public List<Directory_Entry> DirectoryTable;
 		public _Directory()
 		{
 		}
 
-		public _Directory(string n, byte attr, byte[] empty, int siz, int fc,_Directory parent) : base( n,  attr,  empty,  siz,  fc)
+		public _Directory(string n, byte attr, int siz, int fc,_Directory parent) : base( n,  attr,  empty,  siz,  fc)
 		{
-			this.parent = parent;
+            DirectoryTable = new List<Directory_Entry>();
+
+
+            if (parent != null)
+            {
+                this.parent = parent;
+            }
             if (first_cluster != 0)
                 fc = first_cluster;
             else
@@ -122,44 +128,56 @@ namespace Programming
 			return -1;
 
 		}
-        private int GetParentDirectoryIndex(_Directory de)
-        {
-            int parentDirectoryIndex = -1; // Default value if parent directory is not found
-            int targetFirstCluster = DirectoryTable[search(de.name.ToString())].first_cluster;
-            // Iterate through the DirectoryTable to find the parent directory
-            for (int i = 0; i < DirectoryTable.Count; i++)
-            {
-                if (i != search(de.name.ToString()) && DirectoryTable[i].first_cluster == targetFirstCluster)
-                {
-                    // Parent directory found
-                    parentDirectoryIndex = i;
-                    break;
-                }
-            }
-
-            return parentDirectoryIndex;
-        }
-        public void DeleteDirectory(_Directory de)
+       
+        public void DeleteDirectory()
 		{
-            // Code to delete the directory from the FAT table using a chain
-
-            int directoryIndex = search(de.name.ToString()); // Get the index of the directory entry you want to delete
-            int firstCluster = DirectoryTable[directoryIndex].first_cluster; // Get the first cluster of the directory
-
-            // Clear the chain of blocks associated with the directory
-            int currentCluster = firstCluster;
-            while (currentCluster != -1)
+            if (first_cluster != 0)
             {
-                int nextCluster = FAT_Table.get_value(currentCluster); // Get the next cluster in the chain
-                FAT_Table.set_value(currentCluster, 0); // Set the current cluster to 0 to mark it as free
-                currentCluster = nextCluster; // Move to the next cluster
+                int fatindex = first_cluster;
+                int next = FAT_Table.get_value(fatindex);
+                do
+                {
+                    FAT_Table.set_value(fatindex, 0);
+                    fatindex = next;
+                    if (fatindex != -1)
+                    {
+                        next = FAT_Table.get_value(fatindex);
+
+                    }
+                }
+                while (next != -1);
             }
 
-            // Code to remove the directory from the parent directory's list
-            int parentDirectoryIndex = GetParentDirectoryIndex(de); // Get the index of the parent directory entry
-            DirectoryTable.RemoveAt(directoryIndex); //Remove the directory index from the directoryTable
-            /*there exist code here*/// Remove the directory index from the parent's list of subdirectories
+            if (parent != null)
+            {
+                parent.Read_Directory();
+
+                string y = new string(name);
+
+
+                int i = parent.search(y);
+                if (i != -1)
+                {
+                    parent.DirectoryTable.RemoveAt(i);
+                    parent.Write_Directory();
+                }
+
+
+            }
             FAT_Table.write_fat_table();
+        }
+
+        public void update(Directory_Entry d)
+        {
+            Read_Directory();
+            int index = search(new string(d.name));
+
+
+            if (index != -1)
+            {
+                DirectoryTable.RemoveAt(index);
+                DirectoryTable.Insert(index, d);
+            }
         }
 
     }
