@@ -26,9 +26,13 @@ namespace Programming
                      continue;
 
                 string[] inputParts = input.Split(' ', 2);
+
                 string command = inputParts[0];
                 string parameter = inputParts.Length > 1 ? inputParts[1] : "";
-
+                if (inputParts.Length < 2)
+                {
+                    command.Trim();
+                }
                 switch (command)
                 {
                     case "help":
@@ -50,6 +54,7 @@ namespace Programming
                         rd(parameter);
                         break;
                     case "dir":
+                        
                         dir();
                         break;
                     case "rename":

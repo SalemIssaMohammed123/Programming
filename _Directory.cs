@@ -186,7 +186,7 @@ namespace Programming
 				//casting the array of char to string and use function that exists in any string TrimEnd("\0")
                 string directoryName = new string(directory.name);
                 //Compare the directory entry name with the given parameter
-                if (directoryName == name.TrimEnd(' '))
+                if (directoryName.TrimEnd(' ') == name)
 
                 {
 					//Return the index if both names are identical
@@ -220,7 +220,7 @@ namespace Programming
             {
                 parent.Read_Directory();
 
-                string y = new string(name);
+                string y = new string(name).TrimEnd(' ');
 
 
                 int i = parent.search(y);

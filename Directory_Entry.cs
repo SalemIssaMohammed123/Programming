@@ -49,7 +49,7 @@ namespace Programming
 		public byte[] Convert_Directory_Entry_TobyteArray()
 		{
 			byte[] data=new byte[32];//Directory entry data
-			name = string.Join(string.Empty, data).PadRight(11, ' ').ToCharArray();
+			name = string.Join(string.Empty,name).PadRight(11, ' ').ToCharArray();
 			for(int i=0; i < 11; i++)//0:11
 			{
 				data[i] = Convert.ToByte(name[i]);

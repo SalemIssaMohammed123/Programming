@@ -174,13 +174,7 @@ namespace Programming
             }
             else
             {
-                Directory_Entry newDirectory = new Directory_Entry()
-                {
-                    name = name.ToCharArray(),
-                    size = 0,
-                    first_cluster = 0,
-                    attribute = 1,
-                };
+                Directory_Entry newDirectory = new Directory_Entry(name, 1, 0, 0);
                 Program.current_Directory.DirectoryTable.Add(newDirectory);
                 Program.current_Directory.Write_Directory();
                 if (Program.current_Directory.parent != null)
@@ -202,7 +196,7 @@ namespace Programming
                 int firstCluster = Program.current_Directory.DirectoryTable[index].first_cluster;
 
 
-                _Directory d1 = new _Directory(name, 0x1, firstCluster, 0, Program.current_Directory);
+                _Directory d1 = new _Directory(name, 0x1, 0, firstCluster, Program.current_Directory);
                 d1.DeleteDirectory();
 
                 Program.current_Path = new string(Program.current_Directory.name).Trim();
@@ -219,7 +213,7 @@ namespace Programming
             foreach (var directory in Program.current_Directory.DirectoryTable)
             {
                 if (directory.name[0] != '\0')
-                    Console.WriteLine(new string(directory.name).TrimEnd('\0'));
+                    Console.WriteLine(new string(directory.name).TrimEnd(' '));
             }
            
         }
