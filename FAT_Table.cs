@@ -11,9 +11,10 @@ namespace Programming
        some other utility methods.
      */
     {
+        private const int TotalBlocks = 1024; // Total number of blocks in the virtual disk
         private const int BlockSize = 1024;
         private const int FatSize = 4;
-        private static int[] fatTable=new int[BlockSize/*(1024)*/];//default for this array is zero specialized from index 5 to index 1023
+        public static int[] fatTable=new int[BlockSize/*(1024)*/];//default for this array is zero specialized from index 5 to index 1023
         public static void initialize()
         {
             fatTable[0] =-1;
@@ -21,6 +22,10 @@ namespace Programming
             fatTable[2]=3;
             fatTable[3]=4;
             fatTable[4]=-1;
+            for (int i = 5; i < TotalBlocks; i++)
+            {
+                fatTable[i] = 0;
+            }
         }
         public static void write_fat_table()
         /*This method writes the fat table data into the virtual disk (text file)*/
@@ -38,9 +43,14 @@ namespace Programming
                 fs.Seek(1024,SeekOrigin.Begin);
                 //write()
                 fs.Write(data, 0, data.Length/*(4096)*/);
+                for (int i = 0; i < TotalBlocks; i++) // Convert byte array to FAT array
+                {
+                    fatTable[i] = BitConverter.ToInt32(data, i * 4);
+                }
+                fs.Close();
             }
 
-            }
+        }
         public static void read_fat_table()
         /*This method read the data from the virtual disk (text file) into the fat table array*/
 

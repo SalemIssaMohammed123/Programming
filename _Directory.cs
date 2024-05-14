@@ -33,7 +33,58 @@ namespace Programming
                 first_cluster = fc;
             }
         }
-		public void Write_Directory()
+        /*public void Write_Directory() {
+    // Converts `DirectoryTable` to bytes and stores them,Wirte in Virual and
+    // Fat
+
+    List<byte> directoryBytes = new List<byte>();
+
+    // Convert each entry to bytes and store in directoryBytes
+    foreach (var entry in DirectoryTable) {
+      directoryBytes.AddRange(entry.Convert_Directory_Entry());
+    }
+
+    int totalBlocksNeeded =
+        (int)Math.Ceiling((double)directoryBytes.Count / VirtualDisk.BlockSize);
+    int fullBlocks = directoryBytes.Count / VirtualDisk.BlockSize;
+    int remainingBytes = directoryBytes.Count % VirtualDisk.BlockSize;
+
+    int fc;
+    if (first_cluster != 0)
+      fc = first_cluster;
+    else {
+      fc = Fat_Table.GetAvailableBlock();
+      first_cluster = fc;
+    }
+    int nc = -1;
+    for (int i = 0; i < totalBlocksNeeded; i++) {
+      byte[] blockData; // representing the current block
+      if (i <
+          fullBlocks) // it means that the current block is not the last block
+      {
+        blockData =
+            directoryBytes
+                .GetRange(i * VirtualDisk.BlockSize, VirtualDisk.BlockSize)
+                .ToArray();
+      } else // last block
+      {
+        blockData = new byte[VirtualDisk.BlockSize];
+        directoryBytes.CopyTo(i * VirtualDisk.BlockSize, blockData, 0,
+                              remainingBytes);
+        for (int j = remainingBytes; j < VirtualDisk.BlockSize; j++) {
+          blockData[j] = 0xFF; // Fill remaining bytes with some value
+        }
+        nc = -1;
+      }
+      VirtualDisk.WriteBlock(blockData, fc);
+      Fat_Table.SetValue(fc, nc);
+      nc = fc;
+      fc = Fat_Table.GetAvailableBlock();
+    }
+
+    Fat_Table.WriteFatTable();
+  }*/
+        public void Write_Directory()
 		{
 			int count = DirectoryTable.Count;
 			byte[] array1 = new byte[32];
@@ -43,8 +94,16 @@ namespace Programming
 				Array.Copy(DirectoryEntry.Convert_Directory_Entry_TobyteArray(), 0, array1, 0, array1.Length);
 				array2.AddRange(array1);
 			}
-			/////////////////////////////////////////////////code here
-			int nc = -1;
+            /////////////////////////////////////////////////code here
+            int fc;
+            if (first_cluster != 0)
+                fc = first_cluster;
+            else
+            {
+                fc = FAT_Table.get_available_block();
+                first_cluster = fc;
+            }
+            int nc = -1;
 			int totalBlocks = (int)Math.Ceiling(array2.Count / 1024.0);
 			int fullBlocks = array2.Count / 1024;
 			int remainderBlocks = array2.Count % 1024;
@@ -52,59 +111,68 @@ namespace Programming
 			byte[] reserved = new byte[1024 - remainderBlocks];
 			byte[] totalData = array2.ToArray();
 			totalData = totalData.Concat(reserved).ToArray();
-			for (int i = 0; i < fullBlocks; i++)
-			{
-				byte[] block = new byte[1024];
-				int start = i * 1024;
-				int end = start + 1024;
-				Array.Copy(totalData, start, block, 0, block.Length);
-				Virtual_Disk.Write_Block(block, i);
-				if (nc == -1)
-				{
-					FAT_Table.set_value(first_cluster, -1);
-					nc = first_cluster;
-					first_cluster = FAT_Table.get_available_block();
-				}
-				if (i == 0)
-				{
-					nc = FAT_Table.get_value(first_cluster);
-				}
-				if (nc != -1)
-				{
-					FAT_Table.set_value(first_cluster, nc);
-				}
-				else
-				{
-					FAT_Table.set_value(nc, first_cluster);
-					nc = first_cluster;
-					first_cluster = FAT_Table.get_available_block();
-				}
-			}
-			FAT_Table.write_fat_table();
+            for (int i = 0; i < totalBlocks; i++)
+            {
+                byte[] blockData; // representing the current block
+                if (i <
+                    fullBlocks) // it means that the current block is not the last block
+                {
+                    blockData = array2
+                            .GetRange(i * Virtual_Disk.BlockSize, Virtual_Disk.BlockSize)
+                            .ToArray();
+
+                }
+                else // last block
+                {
+                    blockData = new byte[Virtual_Disk.BlockSize];
+                    array2.CopyTo(i * Virtual_Disk.BlockSize, blockData, 0,
+                                          remainderBlocks);
+                    for (int j = remainderBlocks; j < Virtual_Disk.BlockSize; j++)
+                    {
+                        blockData[j] = 0xFF; // Fill remaining bytes with some value
+                    }
+                    nc = -1;
+                }
+                Virtual_Disk.Write_Block(blockData, fc);
+                FAT_Table.set_value(fc, nc);
+                nc = fc;
+                fc = FAT_Table.get_available_block();
+            }
+            FAT_Table.write_fat_table();
 		}
 		public void Read_Directory()
 		{
             //create list of bytes
             List<byte> list = new List<byte>();
+            this.DirectoryTable.Clear();
 			int fc = first_cluster;
-			int nc = FAT_Table.get_value(fc);
-			while(nc != -1)
+            if (fc == 0)
+            {
+                return;
+            }
+            //int nc = FAT_Table.get_value(fc);
+			while(fc != -1)
 			{
-				byte[]block=Virtual_Disk.Read_Block(fc);
-				list.AddRange(block);
-				fc = nc;
-				nc=FAT_Table.get_value(fc);
-			}
-
-			for(int i = 0; i < list.Count / 32; i++)
-			{
-				int start = i * 32;
-				byte[] array = new byte[32];
-                Array.Copy(list.ToArray(), start, array, 0, array.Length);
-				Directory_Entry de = Get_Directory_Entry(array);
-                DirectoryTable.Add(de);
-
-
+                list.AddRange(Virtual_Disk.Read_Block(fc));
+				fc=FAT_Table.get_value(fc);
+                for (int i = 0; i < Virtual_Disk.BlockSize;
+                    i += Directory_Entry.EntrySize)
+                { // Adds the parsed Directory_Entry
+                  // object to the DirectoryTable.
+                    List<byte> entryBytes =
+                        list.GetRange(i, Directory_Entry.EntrySize).ToList();
+                    for (int j = 0; j < entryBytes.Count; j += Directory_Entry.EntrySize)
+                    {
+                        Directory_Entry entry = new Directory_Entry();
+                        entry.Get_Directory_Entry(entryBytes.ToArray());
+                        if (entryBytes.GetRange(j, Directory_Entry.EntrySize)
+                                .All(x => x == 0xFF))
+                        {
+                            break;
+                        }
+                        DirectoryTable.Add(entry);
+                    }
+                }
             }
         }
 		//vji0.0
@@ -118,7 +186,7 @@ namespace Programming
 				//casting the array of char to string and use function that exists in any string TrimEnd("\0")
                 string directoryName = new string(directory.name);
                 //Compare the directory entry name with the given parameter
-                if (directoryName == name.TrimEnd('\0'))
+                if (directoryName == name.TrimEnd(' '))
 
                 {
 					//Return the index if both names are identical

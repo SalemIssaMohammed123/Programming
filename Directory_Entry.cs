@@ -8,7 +8,8 @@ namespace Programming
 {
 	public class Directory_Entry
 	{
-		public char[] name = new char[11]; // 11 byte
+        public const int EntrySize = 32; // Size of each directory entry in bytes
+        public char[] name = new char[11]; // 11 byte
 		public byte attribute;
 		public byte[] empty =new byte[12]; // 12 byte
 		public int size;//4 byte
@@ -26,7 +27,7 @@ namespace Programming
 				}
 				else
 				{
-					name=n.ToCharArray();
+					name=n.PadRight(11,' ').ToCharArray();
 				}
 
 			}
@@ -48,6 +49,7 @@ namespace Programming
 		public byte[] Convert_Directory_Entry_TobyteArray()
 		{
 			byte[] data=new byte[32];//Directory entry data
+			name = string.Join(string.Empty, data).PadRight(11, ' ').ToCharArray();
 			for(int i=0; i < 11; i++)//0:11
 			{
 				data[i] = Convert.ToByte(name[i]);

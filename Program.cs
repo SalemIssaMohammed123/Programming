@@ -8,13 +8,18 @@ namespace Programming
         public static string input;
 		public static _Directory current_Directory ;
 		static void Main(string[] args)
-        {   //initialize both virtual disk and FAT System
+        {
+
+            current_Directory = new _Directory("root", 1, 0, 5, null!);
+            //initialize both virtual disk and FAT System
             Virtual_Disk.Initialize();
-            FAT_Table.initialize();
-            current_Path = new string(current_Directory.name);
+            // Initialize the root directory
+            current_Directory.Read_Directory();
+            current_Directory.Write_Directory(); // Write the root directory to virtual disk
+            //current_Path = new string(current_Directory.name);
             while (true)
             {
-                Console.Write($"{current_Path}> ");
+                Console.Write($"{string.Join("", current_Directory.name)}/>");
                  input = Console.ReadLine().Trim().ToLower();
 
                 if (string.IsNullOrWhiteSpace(input))
@@ -43,6 +48,9 @@ namespace Programming
                         break;
                     case "rd":
                         rd(parameter);
+                        break;
+                    case "dir":
+                        dir();
                         break;
                     case "rename":
                         string[] renameParams = parameter.Split(' ', 2);

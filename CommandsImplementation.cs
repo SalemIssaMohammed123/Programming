@@ -52,6 +52,9 @@ namespace Programming
                     case "del":
                         Console.WriteLine("del - Deletes one or more files.");
                         break;
+                    case "dir":
+                        Console.WriteLine("dir - Displays directory of files and directories stored on disk.");
+                        break;
                     case "help":
                         Console.WriteLine("help -Provides Help information for commands.");
                         break;
@@ -165,9 +168,9 @@ namespace Programming
         public static void md (string name)
         {
             
-            if (Program.current_Directory.search(name) != null)
+            if (Program.current_Directory.search(name) != -1)
             {
-                Console.WriteLine("Directory or file " + name + "already exists.");
+                Console.WriteLine("Directory or file " + name + " already exists.");
             }
             else
             {
@@ -186,7 +189,7 @@ namespace Programming
                     Program.current_Directory.parent.Write_Directory();
 
                 }
-                FAT_Table.write_fat_table();
+                //FAT_Table.write_fat_table();
                 Console.WriteLine("Directory created successfully.");
             }
 
@@ -210,19 +213,15 @@ namespace Programming
                 Console.WriteLine("And cannot remove this directory.");
             }
         }
-        public void dir(string name)
+        public static void dir()
         {
-            if (Program.current_Directory.search(name) == null)
+
+            foreach (var directory in Program.current_Directory.DirectoryTable)
             {
-                Console.WriteLine("Directory doesnot exist.");
+                if (directory.name[0] != '\0')
+                    Console.WriteLine(new string(directory.name).TrimEnd('\0'));
             }
-            else
-            {
-                for (int i = 0; i < Program.current_Directory.DirectoryTable.Count; i++)
-                {
-                    Console.WriteLine(Program.current_Directory.DirectoryTable[i].name);
-                }
-            }
+           
         }
 
         public static void rename(string old, string New)
