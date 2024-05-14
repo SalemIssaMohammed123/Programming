@@ -85,15 +85,15 @@ namespace Programming
     Fat_Table.WriteFatTable();
   }*/
         public void Write_Directory()
-		{
-			int count = DirectoryTable.Count;
-			byte[] array1 = new byte[32];
-			List<byte> array2 = new List<byte>();// or use byte[]array2=new byte[32*count];
-			foreach (var DirectoryEntry in DirectoryTable)
-			{
-				Array.Copy(DirectoryEntry.Convert_Directory_Entry_TobyteArray(), 0, array1, 0, array1.Length);
-				array2.AddRange(array1);
-			}
+        {
+            int count = DirectoryTable.Count;
+            byte[] array1 = new byte[32];
+            List<byte> array2 = new List<byte>();// or use byte[]array2=new byte[32*count];
+            foreach (var DirectoryEntry in DirectoryTable)
+            {
+                Array.Copy(DirectoryEntry.Convert_Directory_Entry_TobyteArray(), 0, array1, 0, array1.Length);
+                array2.AddRange(array1);
+            }
             /////////////////////////////////////////////////code here
             int fc;
             if (first_cluster != 0)
@@ -104,13 +104,13 @@ namespace Programming
                 first_cluster = fc;
             }
             int nc = -1;
-			int totalBlocks = (int)Math.Ceiling(array2.Count / 1024.0);
-			int fullBlocks = array2.Count / 1024;
-			int remainderBlocks = array2.Count % 1024;
-			//creat an array to make the remainder block as fullblock
-			byte[] reserved = new byte[1024 - remainderBlocks];
-			byte[] totalData = array2.ToArray();
-			totalData = totalData.Concat(reserved).ToArray();
+            int totalBlocks = (int)Math.Ceiling(array2.Count / 1024.0);
+            int fullBlocks = array2.Count / 1024;
+            int remainderBlocks = array2.Count % 1024;
+            //creat an array to make the remainder block as fullblock
+            byte[] reserved = new byte[1024 - remainderBlocks];
+            byte[] totalData = array2.ToArray();
+            totalData = totalData.Concat(reserved).ToArray();
             for (int i = 0; i < totalBlocks; i++)
             {
                 byte[] blockData; // representing the current block
@@ -135,12 +135,13 @@ namespace Programming
                 }
                 Virtual_Disk.Write_Block(blockData, fc);
                 FAT_Table.set_value(fc, nc);
+                FAT_Table.write_fat_table();
                 nc = fc;
                 fc = FAT_Table.get_available_block();
             }
-            FAT_Table.write_fat_table();
-		}
-		public void Read_Directory()
+           ;
+        }
+        public void Read_Directory()
 		{
             //create list of bytes
             List<byte> list = new List<byte>();
